@@ -136,6 +136,7 @@ class Market(gym.Env):
     def get_reward(self, action):
         """Compute reward from the chosen action, it returns the price change multiplied by the size of the position"""
         reward = 0
+        prev_pos = self.position
         
         # you can disable the following line if you want 
         #action = self.rule_of_thumbs_check(action)
@@ -149,7 +150,7 @@ class Market(gym.Env):
                 
         num_of_contracts = abs(self.position * (self.capital / self.df['close'].values[-1]))
         
-        reward -= self.commission * num_of_contracts
+        reward -= abs(prev_pos - self.position) * self.capital * self.comission
         reward += (self.df['close'].values[-1] - self.df['close'].values[-2]) * num_of_contracts
             
         return reward
