@@ -48,7 +48,6 @@ class Market(gym.Env):
        
         self.done = False 
         self.n_step = start_step
-        self.episode = 0
         
         self.df = df.iloc[self.n_step-WINDOW:self.n_step]
         
@@ -74,7 +73,6 @@ class Market(gym.Env):
         self.capital = 1000
         self.done = False
         self.n_step = start_step
-        self.episode +=1
         
         self.df = df.iloc[self.n_step-WINDOW:self.n_step]
         
@@ -143,8 +141,6 @@ class Market(gym.Env):
             
         elif action['enter'] == 0:
             self.position =  max([-action['size'] + self.position, np.asarray([-1.0])])             
-                
-        num_of_contracts = abs(self.position * (self.capital / self.df['close'].values[-1]))
         
         reward -= abs(prev_pos - self.position) * self.capital * self.commission
         reward += (self.df['close'].values[-1] - self.df['close'].values[-2]) * num_of_contracts
