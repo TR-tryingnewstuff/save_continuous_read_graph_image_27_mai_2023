@@ -43,7 +43,7 @@ class Market(gym.Env):
         # Initializing the attributes
         self.list_capital = []
         self.position = np.array([0.0])
-        self.commission = 0.75 # per contract 
+        self.commission = 0.00025
         self.capital = 1000
        
         self.done = False 
@@ -96,17 +96,13 @@ class Market(gym.Env):
             reward = self.get_reward(action)
             
         else:
-            num_of_contracts = abs(self.position * (self.capital / self.df['close'].values[-1]))
             reward = (self.df['close'].values[-1] - self.df['close'].values[-2]) * self.position
         
         self.capital = self.capital + reward
         
-        reward = self.adjust_reward(reward)
         
 
-        if self.df['hour'].values[-1] not in TRADING_HOURS:        # Filter for taking trades only during certain hours
-            reward -= self.commission * action['size']                   # close position at the end of the day
-            self.position = np.array([0.0])
+        if (self.df['hour'].values[-1] not in TRADING_HOURS) and (self.position != 0):        # Filter for taking trades only during 
             
             while not self.df['hour'].values[-1] in TRADING_HOURS:
                 self.n_step += 1
@@ -150,7 +146,7 @@ class Market(gym.Env):
                 
         num_of_contracts = abs(self.position * (self.capital / self.df['close'].values[-1]))
         
-        reward -= abs(prev_pos - self.position) * self.capital * self.comission
+        reward -= abs(prev_pos - self.position) * self.capital * self.commission
         reward += (self.df['close'].values[-1] - self.df['close'].values[-2]) * num_of_contracts
             
         return reward
